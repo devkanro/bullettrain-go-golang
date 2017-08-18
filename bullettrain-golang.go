@@ -58,7 +58,7 @@ func (c *Car) CanShow() bool {
 
 	// Show when .go files exist in current directory
 	p := fmt.Sprintf("%s%s*.go", d, string(os.PathSeparator))
-	f, err := filepath.Glob(p)
+	f, _ := filepath.Glob(p)
 	if f != nil {
 		return true
 	}
