@@ -12,8 +12,8 @@ import (
 )
 
 const carPaint = "black:123"
-const pythonSymbolPaint = "black:123"
-const pythonSymbolIcon = ""
+const goSymbolPaint = "black:123"
+const goSymbolIcon = ""
 
 // Car for Go
 type Car struct {
@@ -23,12 +23,12 @@ type Car struct {
 func paintedSymbol() string {
 	var symbolIcon string
 	if symbolIcon = os.Getenv("BULLETTRAIN_CAR_GO_ICON"); symbolIcon == "" {
-		symbolIcon = pythonSymbolIcon
+		symbolIcon = goSymbolIcon
 	}
 
 	var symbolPaint string
 	if symbolPaint = os.Getenv("BULLETTRAIN_CAR_GO_ICON_PAINT"); symbolPaint == "" {
-		symbolPaint = pythonSymbolPaint
+		symbolPaint = goSymbolPaint
 	}
 
 	return ansi.Color(symbolIcon, symbolPaint)
@@ -57,9 +57,9 @@ func (c *Car) CanShow() bool {
 	d := strings.Trim(string(pwd), "\n")
 
 	// Show when .go files exist in current directory
-	pyPattern := fmt.Sprintf("%s%s*.go", d, string(os.PathSeparator))
-	pyFiles, err := filepath.Glob(pyPattern)
-	if pyFiles != nil {
+	p := fmt.Sprintf("%s%s*.go", d, string(os.PathSeparator))
+	f, err := filepath.Glob(p)
+	if f != nil {
 		return true
 	}
 
