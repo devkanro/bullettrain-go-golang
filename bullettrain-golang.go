@@ -1,35 +1,99 @@
-package bullettrain_go_golang
+package carGo
 
 import (
+	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
+	"regexp"
 	"strings"
 
-	"github.com/fatih/color"
+	"github.com/mgutz/ansi"
 )
 
-type Segment struct {
-	Fg, Bg color.Attribute
+const carPaint = "black:123"
+const pythonSymbolPaint = "black:123"
+const pythonSymbolIcon = ""
+
+// Car for Go
+type Car struct {
+	paint string
 }
 
-func (p *Segment) SetFg(fg color.Attribute) {
-	p.Fg = fg
-}
-
-func (p *Segment) SetBg(bg color.Attribute) {
-	p.Bg = bg
-}
-
-func (p *Segment) Render(ch chan<- string) {
-	const golang_symbol string = "🐹"
-	defer close(ch) // Always close the channel!
-
-	col := color.New(p.Fg, p.Bg)
-
-	golangCmd := exec.Command("go", "version")
-	versions_info, err := golangCmd.Output()
-	if err == nil {
-		ch <- col.Sprintf(" %s %s ", golang_symbol,
-			strings.Trim(string(versions_info), "\n"))
-		return
+func paintedSymbol() string {
+	var symbolIcon string
+	if symbolIcon = os.Getenv("BULLETTRAIN_CAR_GO_ICON"); symbolIcon == "" {
+		symbolIcon = pythonSymbolIcon
 	}
+
+	var symbolPaint string
+	if symbolPaint = os.Getenv("BULLETTRAIN_CAR_GO_ICON_PAINT"); symbolPaint == "" {
+		symbolPaint = pythonSymbolPaint
+	}
+
+	return ansi.Color(symbolIcon, symbolPaint)
+}
+
+// GetPaint returns the calculated end paint string for the car.
+func (c *Car) GetPaint() string {
+	if c.paint = os.Getenv("BULLETTRAIN_CAR_GO_PAINT"); c.paint == "" {
+		c.paint = carPaint
+	}
+
+	return c.paint
+}
+
+// CanShow decides if this car needs to be displayed.
+func (c *Car) CanShow() bool {
+	if e := os.Getenv("BULLETTRAIN_CAR_GO_SHOW"); e == "true" {
+		return true
+	}
+
+	cmd := exec.Command("pwd", "-P")
+	pwd, err := cmd.Output()
+	if err != nil {
+		return false
+	}
+	d := strings.Trim(string(pwd), "\n")
+
+	// Show when .go files exist in current directory
+	pyPattern := fmt.Sprintf("%s%s*.go", d, string(os.PathSeparator))
+	pyFiles, err := filepath.Glob(pyPattern)
+	if pyFiles != nil {
+		return true
+	}
+
+	return false
+}
+
+// Render builds and passes the end product of a completely composed car onto
+// the channel.
+func (c *Car) Render(out chan<- string) {
+	defer close(out) // Always close the channel!
+	carPaint := ansi.ColorFunc(c.GetPaint())
+
+	cmd := exec.Command("go", "version")
+	cmdOut, err := cmd.Output()
+	if err == nil {
+		re := regexp.MustCompile(`([0-9.]+)`)
+		versionArr := re.FindStringSubmatch(string(cmdOut))
+		var version string
+		if len(versionArr) > 0 {
+			version = versionArr[1]
+		}
+
+		out <- fmt.Sprintf("%s%s", paintedSymbol(), carPaint(version))
+	}
+}
+
+// GetSeparatorPaint overrides the Fg/Bg colours of the right hand side
+// separator through ENV variables.
+func (c *Car) GetSeparatorPaint() string {
+	return os.Getenv("BULLETTRAIN_CAR_GO_SEPARATOR_PAINT")
+}
+
+// GetSeparatorSymbol overrides the symbol of the right hand side
+// separator through ENV variables.
+func (c *Car) GetSeparatorSymbol() string {
+	return os.Getenv("BULLETTRAIN_CAR_GO_SEPARATOR_SYMBOL")
 }
