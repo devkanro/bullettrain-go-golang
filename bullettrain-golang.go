@@ -6,7 +6,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strings"
 
 	"github.com/mgutz/ansi"
 )
@@ -18,6 +17,8 @@ const goSymbolIcon = ""
 // Car for Go
 type Car struct {
 	paint string
+	// Current directory
+	Pwd string
 }
 
 func paintedSymbol() string {
@@ -49,12 +50,10 @@ func (c *Car) CanShow() bool {
 		return true
 	}
 
-	cmd := exec.Command("pwd", "-P")
-	pwd, err := cmd.Output()
-	if err != nil {
+	var d string
+	if d = c.Pwd; d == "" {
 		return false
 	}
-	d := strings.Trim(string(pwd), "\n")
 
 	// Show when .go files exist in current directory
 	p := fmt.Sprintf("%s%s*.go", d, string(os.PathSeparator))
