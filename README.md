@@ -7,12 +7,12 @@
 
 ## Car options
 
-| Environment variable            | Description                                     | Default value|
-| :---                            | :---                                            | :---|
+| Environment variable            | Description                                     | Default value |
+| :---                            | :---                                            | :---          |
 | BULLETTRAIN_CAR_GO_SHOW         | Whether the car needs to be shown all the time. | false         |
 | BULLETTRAIN_CAR_GO_PAINT        | Colour override for the car't paint.            | black:123     |
 | BULLETTRAIN_CAR_GO_SYMBOL_ICON  | Icon displayed on the car.                      | ``           |
-| BULLETTRAIN_CAR_GO_SYMBOL_PAINT | Colour override for the car's symbol.           | black:123        |
+| BULLETTRAIN_CAR_GO_SYMBOL_PAINT | Colour override for the car's symbol.           | black:123     |
 
 # Contribute
 
