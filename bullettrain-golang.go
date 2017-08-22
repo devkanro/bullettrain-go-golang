@@ -10,9 +10,11 @@ import (
 	"github.com/mgutz/ansi"
 )
 
-const carPaint = "black:123"
-const goSymbolPaint = "black:123"
-const goSymbolIcon = ""
+const (
+	carPaint      = "black:123"
+	goSymbolPaint = "black:123"
+	goSymbolIcon  = ""
+)
 
 // Car for Go
 type Car struct {
