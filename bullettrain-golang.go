@@ -13,7 +13,7 @@ import (
 const (
 	carPaint      = "black:123"
 	goSymbolPaint = "black:123"
-	goSymbolIcon  = ""
+	goSymbolIcon  = " "
 )
 
 // Car for Go
