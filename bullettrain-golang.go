@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/bullettrain-sh/bullettrain-go-core/pkg/ansi"
 )
@@ -74,7 +75,7 @@ func (c *Car) Render(out chan<- string) {
 	carPaint := ansi.ColorFunc(c.GetPaint())
 
 	cmd := exec.Command("go", "version")
-	cmdOut, err := cmd.Output()
+	cmdOut, err := cmd.CombinedOutput()
 	if err == nil {
 		re := regexp.MustCompile(`([0-9.]+)`)
 		versionArr := re.FindStringSubmatch(string(cmdOut))
@@ -84,6 +85,9 @@ func (c *Car) Render(out chan<- string) {
 		}
 
 		out <- fmt.Sprintf("%s%s", paintedSymbol(), carPaint(version))
+	} else {
+		output := strings.Replace(string(cmdOut), "\n", " ", -1)
+		out <- fmt.Sprintf("%s%s", paintedSymbol(), carPaint(output))
 	}
 }
 
