@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"github.com/bullettrain-sh/bullettrain-go-core/ansi"
+	"github.com/bullettrain-sh/bullettrain-go-core/pkg/ansi"
 )
 
 const (
