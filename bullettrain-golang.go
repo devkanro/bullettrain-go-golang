@@ -1,12 +1,15 @@
 package carGo
 
 import (
+	"bytes"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"text/template"
 
 	"github.com/bullettrain-sh/bullettrain-go-core/pkg/ansi"
 )
@@ -14,7 +17,8 @@ import (
 const (
 	carPaint      = "black:123"
 	goSymbolPaint = "black:123"
-	goSymbolIcon  = " "
+	goSymbolIcon  = ""
+	carTemplate   = `{{.Icon | printf "%s " | cs}}{{.Info | c}}`
 )
 
 // Car for Go
@@ -22,20 +26,6 @@ type Car struct {
 	paint string
 	// Current directory
 	Pwd string
-}
-
-func paintedSymbol() string {
-	var symbolIcon string
-	if symbolIcon = os.Getenv("BULLETTRAIN_CAR_GO_ICON"); symbolIcon == "" {
-		symbolIcon = goSymbolIcon
-	}
-
-	var symbolPaint string
-	if symbolPaint = os.Getenv("BULLETTRAIN_CAR_GO_ICON_PAINT"); symbolPaint == "" {
-		symbolPaint = goSymbolPaint
-	}
-
-	return ansi.Color(symbolIcon, symbolPaint)
 }
 
 // GetPaint returns the calculated end paint string for the car.
@@ -72,23 +62,53 @@ func (c *Car) CanShow() bool {
 // the channel.
 func (c *Car) Render(out chan<- string) {
 	defer close(out) // Always close the channel!
-	carPaint := ansi.ColorFunc(c.GetPaint())
+
+	var symbolIcon string
+	if symbolIcon = os.Getenv("BULLETTRAIN_CAR_GO_ICON"); symbolIcon == "" {
+		symbolIcon = goSymbolIcon
+	}
+
+	var symbolPaint string
+	if symbolPaint = os.Getenv("BULLETTRAIN_CAR_GO_ICON_PAINT"); symbolPaint == "" {
+		symbolPaint = goSymbolPaint
+	}
 
 	cmd := exec.Command("go", "version")
 	cmdOut, err := cmd.CombinedOutput()
+	var version string
 	if err == nil {
 		re := regexp.MustCompile(`([0-9.]+)`)
 		versionArr := re.FindStringSubmatch(string(cmdOut))
-		var version string
 		if len(versionArr) > 0 {
 			version = versionArr[1]
 		}
-
-		out <- fmt.Sprintf("%s%s", paintedSymbol(), carPaint(version))
 	} else {
-		output := strings.Replace(string(cmdOut), "\n", " ", -1)
-		out <- fmt.Sprintf("%s%s", paintedSymbol(), carPaint(output))
+		version = strings.TrimRight(string(cmdOut), "\n")
 	}
+
+	var s string
+	if s = os.Getenv("BULLETTRAIN_CAR_GO_TEMPLATE"); s == "" {
+		s = carTemplate
+	}
+
+	funcMap := template.FuncMap{
+		// Pipeline functions for colouring.
+		"c":  func(t string) string { return ansi.Color(t, c.GetPaint()) },
+		"cs": func(t string) string { return ansi.Color(t, symbolPaint) },
+	}
+
+	tpl := template.Must(template.New("go").Funcs(funcMap).Parse(s))
+	data := struct {
+		Icon string
+		Info string
+	}{Icon: symbolIcon, Info: version}
+	fromTpl := new(bytes.Buffer)
+	err = tpl.Execute(fromTpl, data)
+	if err != nil {
+		log.Fatalf("Can't generate the go template: %s", err.Error())
+	}
+
+	out <- fromTpl.String()
 }
 
 // GetSeparatorPaint overrides the Fg/Bg colours of the right hand side
