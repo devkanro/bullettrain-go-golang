@@ -5,6 +5,20 @@
 - Displaying only when needed
 - Go version display
 
+
+**Callword**: `go`
+
+**Template variables**:
+
+* `.Icon`: the car's icon
+* `.Info`: the Go version text
+
+**Template colours**:
+
+* `c`: the car's colour
+* `cs`: the car symbol's colour
+
+
 ## Car options
 
 | Environment variable            | Description                                     | Default value                                   |
