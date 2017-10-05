@@ -83,7 +83,7 @@ func (c *Car) Render(out chan<- string) {
 			version = versionArr[1]
 		}
 	} else {
-		version = strings.TrimRight(string(cmdOut), "\n")
+		version = strings.Replace(string(cmdOut), "\n", " ", -1)
 	}
 
 	var s string
