@@ -31,4 +31,5 @@
 
 # Contribute
 
-Even reporting your use case will greatly help us to figure out/improve this product, so feel free to reach out in the Issues section.
+Even reporting your use case will greatly help us to figure out/improve
+this product, so feel free to reach out in the Issues section.
