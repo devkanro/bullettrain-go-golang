@@ -64,12 +64,12 @@ func (c *Car) Render(out chan<- string) {
 	defer close(out) // Always close the channel!
 
 	var symbolIcon string
-	if symbolIcon = os.Getenv("BULLETTRAIN_CAR_GO_ICON"); symbolIcon == "" {
+	if symbolIcon = os.Getenv("BULLETTRAIN_CAR_GO_SYMBOL_ICON"); symbolIcon == "" {
 		symbolIcon = goSymbolIcon
 	}
 
 	var symbolPaint string
-	if symbolPaint = os.Getenv("BULLETTRAIN_CAR_GO_ICON_PAINT"); symbolPaint == "" {
+	if symbolPaint = os.Getenv("BULLETTRAIN_CAR_GO_SYMBOL_PAINT"); symbolPaint == "" {
 		symbolPaint = goSymbolPaint
 	}
 
