@@ -18,6 +18,7 @@ const (
 	carPaint      = "black:123"
 	goSymbolPaint = "black:123"
 	goSymbolIcon  = ""
+	// language=GoTemplate
 	carTemplate   = `{{.Icon | printf "%s " | cs}}{{.Info | c}}`
 )
 
@@ -77,6 +78,7 @@ func (c *Car) Render(out chan<- string) {
 	cmdOut, err := cmd.CombinedOutput()
 	var version string
 	if err == nil {
+		// language=GoRegExp
 		re := regexp.MustCompile(`([0-9.]+)`)
 		versionArr := re.FindStringSubmatch(string(cmdOut))
 		if len(versionArr) > 0 {
